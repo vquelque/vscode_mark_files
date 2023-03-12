@@ -8,7 +8,6 @@ import {
   Event,
   workspace,
   ThemeColor,
-  Color,
 } from 'vscode';
 import { asyncReadFile } from './utils';
 import { existsSync, writeFile } from 'fs';
@@ -22,22 +21,7 @@ export class DecorationProvider implements FileDecorationProvider {
   private scopeFilesByProjetRootsURIs: { [scopeUri: string]: string } = {}; //project root URI --> scope file URIs
 
   constructor() {
-    const rootFolders = workspace.workspaceFolders?.map(
-      (folder) => folder.uri.path
-    );
-    if (rootFolders) {
-      for (const rf of rootFolders) {
-        const scopeFilePath = path.join(rf, 'scope.txt');
-        this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
-      }
-
-      for (const wsURI in this.scopeFilesByProjetRootsURIs) {
-        const scopeFileURI = this.scopeFilesByProjetRootsURIs[wsURI];
-        if (existsSync(scopeFileURI)) {
-          this.loadMarkedFiles(scopeFileURI, wsURI); //load marked files from `scope` file in workspace root
-        }
-      }
-    }
+    this.loadFromScopeFile();
   }
 
   provideFileDecoration(uri: Uri, token: CancellationToken): FileDecoration {
@@ -77,6 +61,32 @@ export class DecorationProvider implements FileDecorationProvider {
       }
     });
     this.writeMarkedFilesToFile();
+  }
+
+  public async loadFromScopeFile(reload: boolean = false) {
+    if (reload) {
+      this.markedFiles.forEach((markedFile) => {
+        this.markedFiles.delete(markedFile);
+        this._onDidChangeFileDecorations.fire(Uri.file(markedFile));
+      });
+    }
+    const rootFolders = workspace.workspaceFolders?.map(
+      (folder) => folder.uri.path
+    );
+    if (!rootFolders) {
+      return;
+    }
+    for (const rf of rootFolders) {
+      const scopeFilePath = path.join(rf, 'scope.txt');
+      this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
+    }
+
+    for (const wsURI in this.scopeFilesByProjetRootsURIs) {
+      const scopeFileURI = this.scopeFilesByProjetRootsURIs[wsURI];
+      if (existsSync(scopeFileURI)) {
+        this.loadMarkedFiles(scopeFileURI, wsURI); //load marked files from `scope` file in workspace root
+      }
+    }
   }
 
   public async configChanged() {

@@ -11,7 +11,8 @@ function activate(context) {
     provider = new fileDecorationProvider_1.DecorationProvider();
     let disposable = vscode.window.registerFileDecorationProvider(provider);
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand('marfiles.markUnmarkFile', async (uri) => {
+    disposable = vscode.commands.registerCommand('markfiles.markUnmarkFile', async (contextUri) => {
+        const uri = contextUri || vscode.window.activeTextEditor?.document.uri;
         if (uri) {
             const stat = fs.lstatSync(uri.fsPath);
             if (stat.isDirectory()) {
@@ -26,6 +27,11 @@ function activate(context) {
         }
     });
     context.subscriptions.push(disposable);
+    disposable = vscode.commands.registerCommand('markfiles.reloadFromScopeFile', async () => {
+        provider.loadFromScopeFile(true);
+        vscode.window.showInformationMessage('Loading marked files from scope file(s)');
+    });
+    context.subscriptions.push(disposable);
     //listen to configuration changes
     vscode.workspace.onDidChangeConfiguration((e) => {
         if (e.affectsConfiguration('markfiles')) {
@@ -33,7 +39,6 @@ function activate(context) {
         }
     });
     context.subscriptions.push(disposable);
-    console.log('extension is running');
 }
 exports.activate = activate;
 // This method is called when the extension is deactivated

@@ -11,19 +11,7 @@ class DecorationProvider {
         this.onDidChangeFileDecorations = this._onDidChangeFileDecorations.event;
         this.markedFiles = new Set();
         this.scopeFilesByProjetRootsURIs = {}; //project root URI --> scope file URIs
-        const rootFolders = vscode_1.workspace.workspaceFolders?.map((folder) => folder.uri.path);
-        if (rootFolders) {
-            for (const rf of rootFolders) {
-                const scopeFilePath = path.join(rf, 'scope.txt');
-                this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
-            }
-            for (const wsURI in this.scopeFilesByProjetRootsURIs) {
-                const scopeFileURI = this.scopeFilesByProjetRootsURIs[wsURI];
-                if ((0, fs_1.existsSync)(scopeFileURI)) {
-                    this.loadMarkedFiles(scopeFileURI, wsURI); //load marked files from `scope` file in workspace root
-                }
-            }
-        }
+        this.loadFromScopeFile();
     }
     provideFileDecoration(uri, token) {
         if (token.isCancellationRequested) {
@@ -56,6 +44,28 @@ class DecorationProvider {
             }
         });
         this.writeMarkedFilesToFile();
+    }
+    async loadFromScopeFile(reload = false) {
+        if (reload) {
+            this.markedFiles.forEach((markedFile) => {
+                this.markedFiles.delete(markedFile);
+                this._onDidChangeFileDecorations.fire(vscode_1.Uri.file(markedFile));
+            });
+        }
+        const rootFolders = vscode_1.workspace.workspaceFolders?.map((folder) => folder.uri.path);
+        if (!rootFolders) {
+            return;
+        }
+        for (const rf of rootFolders) {
+            const scopeFilePath = path.join(rf, 'scope.txt');
+            this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
+        }
+        for (const wsURI in this.scopeFilesByProjetRootsURIs) {
+            const scopeFileURI = this.scopeFilesByProjetRootsURIs[wsURI];
+            if ((0, fs_1.existsSync)(scopeFileURI)) {
+                this.loadMarkedFiles(scopeFileURI, wsURI); //load marked files from `scope` file in workspace root
+            }
+        }
     }
     async configChanged() {
         this.markedFiles.forEach((markedFile) => this._onDidChangeFileDecorations.fire(vscode_1.Uri.file(markedFile)));

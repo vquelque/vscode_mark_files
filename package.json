@@ -19,17 +19,21 @@
   "contributes": {
     "commands": [
       {
-        "command": "marfiles.markUnmarkFile",
+        "command": "markfiles.markUnmarkFile",
         "title": "Mark/Unmark current file"
+      },
+      {
+        "command": "markfiles.reloadFromScopeFile",
+        "title": "Reload marked files from scope file"
       }
     ], 
     "menus": {
       "explorer/context": [{
-          "command": "marfiles.markUnmarkFile",
+          "command": "markfiles.markUnmarkFile",
           "group": "Mark/Unmark file"
       }],
       "editor/title/context": [{
-        "command": "marfiles.markUnmarkFile",
+        "command": "markfiles.markUnmarkFile",
         "group": "Mark/Unmark file"
       }]
   },
