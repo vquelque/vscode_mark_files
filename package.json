@@ -1,0 +1,97 @@
+{
+  "name": "markfiles",
+  "displayName": "Mark Files",
+  "description": "An extension that allows you to mark files in the file explorer",
+  "version": "1.0.0",
+  "publisher": "vquelque",
+  "engines": {
+    "vscode": "^1.76.0"
+  },
+  "author": {
+    "name": "vquelque"
+  },
+  "categories": [
+    "Other"
+  ],
+  "icon": "icon.png",
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "marfiles.markUnmarkFile",
+        "title": "Mark/Unmark current file"
+      }
+    ], 
+    "menus": {
+      "explorer/context": [{
+          "command": "marfiles.markUnmarkFile",
+          "group": "Mark/Unmark file"
+      }],
+      "editor/title/context": [{
+        "command": "marfiles.markUnmarkFile",
+        "group": "Mark/Unmark file"
+      }]
+  },
+    "colors": [
+      {
+        "id": "markfiles.markedFileColor",
+        "description": "Color for a marked file",
+        "defaults": {
+          "dark": "#7ad108",
+          "light": "#7ad108"
+        }
+      }
+    ],
+    "configuration": {
+      "title": "Mark Files",
+      "properties": {
+        "markfiles.colorMarkedFile": {
+          "type": "string",
+          "markdownDescription": "Choose whether to mark files by adding an icon, changing the color of the file name or both. Customize the color of the filename in the `#workbench.colorCustomizations#` section using the `markfiles.markedFileColor` key",
+          "default": "icon",
+          "enum": ["icon", "color", "both"],
+          "enumDescriptions": [
+            "Mark files by adding an icon",
+            "Mark files by changing the color of the file name",
+            "Mark files by adding an icon and changing the color of the file name"
+          ]
+        },
+        "markfiles.markedFileIcon": {
+          "type": "string",
+          "description": "Choose the symbol to use for marked files (only unicode character)",
+          "default": "📌",
+          "maxLength": 2,
+          "minLength":1,
+          "pattern": "[^\\x00-\\x7F]+"   
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.76.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "eslint": "^8.34.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^4.9.5",
+    "@vscode/test-electron": "^2.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vquelque/vscode_mark_files.git"
+  },
+  "license": "MIT"
+}
