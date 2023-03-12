@@ -32,6 +32,9 @@ class DecorationProvider {
     }
     //mark or unmark files
     async update(markedFiles, unmarkedFiles) {
+        if (!markedFiles.length && !unmarkedFiles.length) {
+            return;
+        }
         markedFiles.forEach((markedFile) => {
             if (!this.markedFiles.has(markedFile)) {
                 this.markedFiles.add(markedFile);
@@ -75,6 +78,7 @@ class DecorationProvider {
         let markedAbsPath = markedRelPath
             .filter((p) => p.length > 0)
             .map((relPath) => path.resolve(projectRootUri, relPath));
+        //.filter(async (p) => await (await workspace.fs.stat(Uri.parse(p))).type === FileType.File)
         this.update(markedAbsPath, []);
     }
     //write marked files to `scope` file in workspace root
@@ -97,7 +101,12 @@ class DecorationProvider {
         }, {});
         for (const workspaceUri in markedFilesByWS) {
             const markedFiles = markedFilesByWS[workspaceUri].join('\n');
-            (0, fs_1.writeFile)(this.scopeFilesByProjetRootsURIs[workspaceUri], markedFiles, { flag: 'w' }, (err) => console.log(err));
+            const path = this.scopeFilesByProjetRootsURIs[workspaceUri];
+            (0, fs_1.writeFile)(path, markedFiles, { flag: 'w' }, (err) => {
+                if (err) {
+                    console.error(`markfiles: Failed to write scope file with path ${path}. Err: ${err}`);
+                }
+            });
         }
     }
 }

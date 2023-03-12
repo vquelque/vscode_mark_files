@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import { DecorationProvider } from './fileDecorationProvider';
 
 var provider: DecorationProvider;
@@ -15,8 +14,8 @@ export function activate(context: vscode.ExtensionContext) {
 	disposable = vscode.commands.registerCommand('markfiles.markUnmarkFile', async (contextUri: vscode.Uri) => {
 		const uri = contextUri || vscode.window.activeTextEditor?.document.uri;
 		if (uri) {
-			const stat = fs.lstatSync(uri.fsPath);
-			if (stat.isDirectory()) {return;}
+			const stat = await vscode.workspace.fs.stat(uri);
+			if (stat.type !== vscode.FileType.File) {return;} //can't mark directory
 			if (provider.markedFiles.has(uri.fsPath)) {
 				provider.update([], [uri.fsPath]);
 			} else {

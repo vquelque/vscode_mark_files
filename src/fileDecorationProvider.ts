@@ -8,6 +8,7 @@ import {
   Event,
   workspace,
   ThemeColor,
+  FileType,
 } from 'vscode';
 import { asyncReadFile } from './utils';
 import { existsSync, writeFile } from 'fs';
@@ -49,6 +50,9 @@ export class DecorationProvider implements FileDecorationProvider {
     markedFiles: Array<string>,
     unmarkedFiles: Array<string>
   ) {
+    if (!markedFiles.length && !unmarkedFiles.length) {
+      return;
+    }
     markedFiles.forEach((markedFile) => {
       if (!this.markedFiles.has(markedFile)) {
         this.markedFiles.add(markedFile);
@@ -100,6 +104,7 @@ export class DecorationProvider implements FileDecorationProvider {
     let markedAbsPath = markedRelPath
       .filter((p) => p.length > 0)
       .map((relPath) => path.resolve(projectRootUri, relPath));
+    //.filter(async (p) => await (await workspace.fs.stat(Uri.parse(p))).type === FileType.File)
     this.update(markedAbsPath, []);
   }
 
@@ -125,12 +130,14 @@ export class DecorationProvider implements FileDecorationProvider {
 
     for (const workspaceUri in markedFilesByWS) {
       const markedFiles = markedFilesByWS[workspaceUri].join('\n');
-      writeFile(
-        this.scopeFilesByProjetRootsURIs[workspaceUri],
-        markedFiles,
-        { flag: 'w' },
-        (err) => console.log(err)
-      );
+      const path = this.scopeFilesByProjetRootsURIs[workspaceUri];
+      writeFile(path, markedFiles, { flag: 'w' }, (err) => {
+        if (err) {
+          console.error(
+            `markfiles: Failed to write scope file with path ${path}. Err: ${err}`
+          );
+        }
+      });
     }
   }
 }

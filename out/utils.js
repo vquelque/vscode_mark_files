@@ -9,7 +9,7 @@ async function asyncReadFile(path) {
         return arr;
     }
     catch (err) {
-        console.log("Failed to read file. err: " + err);
+        console.error(`markfiles: Failed to read file with path ${path} from disk. err: ${err}`);
     }
 }
 exports.asyncReadFile = asyncReadFile;
