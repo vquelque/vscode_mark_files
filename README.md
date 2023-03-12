@@ -12,7 +12,14 @@ The extension allows you to mark/unmark files by:
 
 Note that the marked files are stored in a `scope.txt` file in the workspace root folder. If the file does not exist, it will be created.
 
-//TODO: Add images
+### Mark/Unmark files from contextual menus
+
+![Mark/Unmark files](images/markfile.gif)
+
+### Import marks from `scope.txt` file
+
+![Mark files from scope file](images/scope.gif)
+
 
 ## Extension Settings
 
