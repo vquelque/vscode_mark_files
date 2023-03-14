@@ -19,7 +19,11 @@
   "contributes": {
     "commands": [
       {
-        "command": "markfiles.markUnmarkFile",
+        "command": "markfiles.markUnmarkSelectedFile",
+        "title": "Mark/Unmark selected file(s)"
+      },
+      {
+        "command": "markfiles.markUnmarkActiveFile",
         "title": "Mark/Unmark current file"
       },
       {
@@ -29,11 +33,11 @@
     ], 
     "menus": {
       "explorer/context": [{
-          "command": "markfiles.markUnmarkFile",
-          "group": "Mark/Unmark file"
+        "command": "markfiles.markUnmarkSelectedFile",
+        "group": "Mark/Unmark file"
       }],
       "editor/title/context": [{
-        "command": "markfiles.markUnmarkFile",
+        "command": "markfiles.markUnmarkActiveFile",
         "group": "Mark/Unmark file"
       }]
   },
