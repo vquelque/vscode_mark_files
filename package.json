@@ -14,7 +14,9 @@
     "Other"
   ],
   "icon": "icon.png",
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -26,17 +28,21 @@
         "command": "markfiles.reloadFromScopeFile",
         "title": "Reload marked files from scope file"
       }
-    ], 
+    ],
     "menus": {
-      "explorer/context": [{
+      "explorer/context": [
+        {
           "command": "markfiles.markUnmarkFile",
           "group": "Mark/Unmark file"
-      }],
-      "editor/title/context": [{
-        "command": "markfiles.markUnmarkFile",
-        "group": "Mark/Unmark file"
-      }]
-  },
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "markfiles.markUnmarkFile",
+          "group": "Mark/Unmark file"
+        }
+      ]
+    },
     "colors": [
       {
         "id": "markfiles.markedFileColor",
@@ -54,7 +60,11 @@
           "type": "string",
           "markdownDescription": "Choose whether to mark files by adding an icon, changing the color of the file name or both. Customize the color of the filename in the `#workbench.colorCustomizations#` section using the `markfiles.markedFileColor` key",
           "default": "icon",
-          "enum": ["icon", "color", "both"],
+          "enum": [
+            "icon",
+            "color",
+            "both"
+          ],
           "enumDescriptions": [
             "Mark files by adding an icon",
             "Mark files by changing the color of the file name",
@@ -66,8 +76,8 @@
           "description": "Choose the symbol to use for marked files (only unicode character)",
           "default": "📌",
           "maxLength": 2,
-          "minLength":1,
-          "pattern": "[^\\x00-\\x7F]+"   
+          "minLength": 1,
+          "pattern": "[^\\x00-\\x7F]+"
         }
       }
     }

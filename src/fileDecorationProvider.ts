@@ -1,4 +1,4 @@
-import path = require('path');
+import path = require("path");
 import {
   Uri,
   CancellationToken,
@@ -9,9 +9,9 @@ import {
   workspace,
   ThemeColor,
   FileType,
-} from 'vscode';
-import { asyncReadFile } from './utils';
-import { existsSync, writeFile } from 'fs';
+} from "vscode";
+import { asyncReadFile } from "./utils";
+import { existsSync, writeFile } from "fs";
 
 export class DecorationProvider implements FileDecorationProvider {
   private readonly _onDidChangeFileDecorations: EventEmitter<Uri | Uri[]> =
@@ -29,17 +29,17 @@ export class DecorationProvider implements FileDecorationProvider {
     if (token.isCancellationRequested) {
       return {};
     }
-    const config = workspace.getConfiguration('markfiles');
+    const config = workspace.getConfiguration("markfiles");
     const colorize =
-      config.colorMarkedFile === 'color' || config.colorMarkedFile === 'both';
+      config.colorMarkedFile === "color" || config.colorMarkedFile === "both";
     const icon =
-      config.colorMarkedFile === 'icon' || config.colorMarkedFile === 'both';
+      config.colorMarkedFile === "icon" || config.colorMarkedFile === "both";
     if (this.markedFiles.has(uri.fsPath)) {
       return {
         propagate: true,
         badge: icon && config.markedFileIcon,
-        tooltip: 'This file is marked',
-        color: colorize && new ThemeColor('markfiles.markedFileColor'),
+        tooltip: "This file is marked",
+        color: colorize && new ThemeColor("markfiles.markedFileColor"),
       };
     }
     return {};
@@ -81,7 +81,7 @@ export class DecorationProvider implements FileDecorationProvider {
       return;
     }
     for (const rf of rootFolders) {
-      const scopeFilePath = path.join(rf, 'scope.txt');
+      const scopeFilePath = path.join(rf, "scope.txt");
       this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
     }
 
@@ -129,9 +129,9 @@ export class DecorationProvider implements FileDecorationProvider {
     }, {});
 
     for (const workspaceUri in markedFilesByWS) {
-      const markedFiles = markedFilesByWS[workspaceUri].join('\n');
+      const markedFiles = markedFilesByWS[workspaceUri].join("\n");
       const path = this.scopeFilesByProjetRootsURIs[workspaceUri];
-      writeFile(path, markedFiles, { flag: 'w' }, (err) => {
+      writeFile(path, markedFiles, { flag: "w" }, (err) => {
         if (err) {
           console.error(
             `markfiles: Failed to write scope file with path ${path}. Err: ${err}`
