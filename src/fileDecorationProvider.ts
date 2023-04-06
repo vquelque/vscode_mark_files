@@ -1,4 +1,8 @@
+import { appendFileSync, existsSync, readFileSync } from "fs";
 import path = require("path");
+
+import Ignore from "ignore";
+
 import {
   Uri,
   CancellationToken,
@@ -6,23 +10,41 @@ import {
   FileDecoration,
   EventEmitter,
   Event,
+  window,
   workspace,
   ThemeColor,
   FileType,
 } from "vscode";
-import { asyncReadFile } from "./utils";
-import { existsSync, writeFile } from "fs";
 
 export class DecorationProvider implements FileDecorationProvider {
   private readonly _onDidChangeFileDecorations: EventEmitter<Uri | Uri[]> =
     new EventEmitter<Uri | Uri[]>();
   readonly onDidChangeFileDecorations: Event<Uri | Uri[]> =
     this._onDidChangeFileDecorations.event;
-  public markedFiles: Set<string> = new Set<string>();
-  private scopeFilesByProjetRootsURIs: { [scopeUri: string]: string } = {}; //project root URI --> scope file URIs
+  private markedFiles: Set<string> = new Set<string>();
+  private output = window.createOutputChannel("Mark Files");
+  private scopeFilesByProjectRootsURIs: { [scopeUri: string]: string } = {}; //project root URI --> scope file URIs
 
   constructor() {
     this.loadFromScopeFile();
+  }
+
+  async markOrUnmark(uri: Uri) {
+    const stat = await workspace.fs.stat(uri);
+
+    if (stat.type !== FileType.File) {
+      return;
+    } //can't mark directory
+
+    const { fsPath } = uri;
+
+    if (this.markedFiles.has(fsPath)) {
+      this.update([], [fsPath]);
+      this.appendToScopeFile(`!${fsPath}\n`);
+    } else {
+      this.update([fsPath], []);
+      this.appendToScopeFile(`${fsPath}\n`);
+    }
   }
 
   provideFileDecoration(uri: Uri, token: CancellationToken): FileDecoration {
@@ -48,7 +70,7 @@ export class DecorationProvider implements FileDecorationProvider {
   //mark or unmark files
   public async update(
     markedFiles: Array<string>,
-    unmarkedFiles: Array<string>
+    unmarkedFiles: Array<string> = []
   ) {
     if (!markedFiles.length && !unmarkedFiles.length) {
       return;
@@ -64,7 +86,6 @@ export class DecorationProvider implements FileDecorationProvider {
         this._onDidChangeFileDecorations.fire(Uri.file(unmarkedFile));
       }
     });
-    this.writeMarkedFilesToFile();
   }
 
   public async loadFromScopeFile(reload: boolean = false) {
@@ -82,11 +103,11 @@ export class DecorationProvider implements FileDecorationProvider {
     }
     for (const rf of rootFolders) {
       const scopeFilePath = path.join(rf, "scope.txt");
-      this.scopeFilesByProjetRootsURIs[rf] = scopeFilePath;
+      this.scopeFilesByProjectRootsURIs[rf] = scopeFilePath;
     }
 
-    for (const wsURI in this.scopeFilesByProjetRootsURIs) {
-      const scopeFileURI = this.scopeFilesByProjetRootsURIs[wsURI];
+    for (const wsURI in this.scopeFilesByProjectRootsURIs) {
+      const scopeFileURI = this.scopeFilesByProjectRootsURIs[wsURI];
       if (existsSync(scopeFileURI)) {
         this.loadMarkedFiles(scopeFileURI, wsURI); //load marked files from `scope` file in workspace root
       }
@@ -100,17 +121,35 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   async loadMarkedFiles(scopeUri: string, projectRootUri: string) {
-    let markedRelPath = (await asyncReadFile(scopeUri)) || [];
-    let markedAbsPath = markedRelPath
-      .filter((p) => p.length > 0)
-      .map((relPath) => path.resolve(projectRootUri, relPath));
-    //.filter(async (p) => await (await workspace.fs.stat(Uri.parse(p))).type === FileType.File)
-    this.update(markedAbsPath, []);
+    const ignore = Ignore();
+
+    try {
+      const patterns = readFileSync(scopeUri, `utf8`);
+      ignore.add(patterns);
+
+      this.output.appendLine(
+        `Loaded patterns from ${scopeUri}:\n\n${patterns}`
+      );
+    } catch (err) {
+      this.output.appendLine(
+        `markfiles: Failed to read file with path ${scopeUri} from disk. err: ${err}`
+      );
+    }
+
+    const markedFiles = (await workspace.findFiles(`**/*`))
+      .map((uri) =>
+        // Ignore needs the file paths to be relative.
+        path.relative(projectRootUri, uri.fsPath)
+      )
+      .filter((filePath) => ignore.ignores(filePath))
+      .map((filePath) => path.resolve(projectRootUri, filePath));
+
+    this.update(markedFiles);
   }
 
   //write marked files to `scope` file in workspace root
-  private async writeMarkedFilesToFile() {
-    if (!Object.keys(this.scopeFilesByProjetRootsURIs).length) {
+  private async appendToScopeFile(pattern: string) {
+    if (!Object.keys(this.scopeFilesByProjectRootsURIs).length) {
       return;
     }
     // sort by workspace folders
@@ -130,14 +169,15 @@ export class DecorationProvider implements FileDecorationProvider {
 
     for (const workspaceUri in markedFilesByWS) {
       const markedFiles = markedFilesByWS[workspaceUri].join("\n");
-      const path = this.scopeFilesByProjetRootsURIs[workspaceUri];
-      writeFile(path, markedFiles, { flag: "w" }, (err) => {
-        if (err) {
-          console.error(
-            `markfiles: Failed to write scope file with path ${path}. Err: ${err}`
-          );
-        }
-      });
+      const path = this.scopeFilesByProjectRootsURIs[workspaceUri];
+
+      try {
+        appendFileSync(path, pattern);
+      } catch (exception) {
+        console.error(
+          `markfiles: Failed to write scope file with path ${path}. Err: ${exception}`
+        );
+      }
     }
   }
 }

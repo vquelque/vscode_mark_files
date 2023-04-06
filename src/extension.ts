@@ -15,15 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
     async (contextUri: vscode.Uri) => {
       const uri = contextUri || vscode.window.activeTextEditor?.document.uri;
       if (uri) {
-        const stat = await vscode.workspace.fs.stat(uri);
-        if (stat.type !== vscode.FileType.File) {
-          return;
-        } //can't mark directory
-        if (provider.markedFiles.has(uri.fsPath)) {
-          provider.update([], [uri.fsPath]);
-        } else {
-          provider.update([uri.fsPath], []);
-        }
+        provider.markOrUnmark(uri);
       }
     }
   );

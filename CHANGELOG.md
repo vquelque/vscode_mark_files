@@ -7,4 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2023-04-05
+
+### Added
+
+- Support for .gitignore patterns.
+
+### Changed
+
+- Formatted files using Prettier.
+
 ## [1.0.0] - 2023-03-12

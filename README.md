@@ -6,7 +6,7 @@
 
 The extension allows you to mark/unmark files by:
 
-- Providing a `scope.txt` file in the workspace root folder. The file contains a list of absolute file paths or relative file paths to the workspace root folder. The file paths must be separated by newlines.
+- Providing a `scope.txt` file in the workspace root folder. The file contains a list of patterns for files to include in the scope. The patterns are written using the [.gitignore format](https://git-scm.com/docs/gitignore#_pattern_format), e.g., `**.sol` to include all Solidity files in all directories.
 - Right clicking on a file in the file explorer and selecting `Mark/Unmark File` from the context menu.
 - Right clicking on an editor tab and selecting `Mark/Unmark File` from the context menu.
 
