@@ -11,25 +11,43 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.window.registerFileDecorationProvider(provider);
 	context.subscriptions.push(disposable);
 
-	disposable = vscode.commands.registerCommand('markfiles.markUnmarkFile', async (contextUri: vscode.Uri) => {
-		const uri = contextUri || vscode.window.activeTextEditor?.document.uri;
-		if (uri) {
-			const stat = await vscode.workspace.fs.stat(uri);
-			if (stat.type !== vscode.FileType.File) {return;} //can't mark directory
-			if (provider.markedFiles.has(uri.fsPath)) {
-				provider.update([], [uri.fsPath]);
-			} else {
-				provider.update([uri.fsPath], []);
-			}
-		} 
-	});
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('markfiles.markUnmarkActiveFile', async (contextUri: vscode.Uri) => {
+			const uri = vscode.window.activeTextEditor?.document.uri;
+			if (uri) {
+				const stat = await vscode.workspace.fs.stat(uri);
+				if (stat.type !== vscode.FileType.File) {return;} //can't mark directory
+				if (provider.markedFiles.has(uri.fsPath)) {
+					provider.update([], [uri.fsPath]);
+				} else {
+					provider.update([uri.fsPath], []);
+				}
+			} 
+		})
+	);
 
-	disposable = vscode.commands.registerCommand('markfiles.reloadFromScopeFile', async () => {
-		provider.loadFromScopeFile(true);
-		vscode.window.showInformationMessage('Loading marked files from scope file(s)');
-	});
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('markfiles.markUnmarkSelectedFile', async (clickedFile: vscode.Uri, selectedFiles: vscode.Uri[]) => {
+			for (const uri of selectedFiles) {
+				if (uri) {
+					const stat = await vscode.workspace.fs.stat(uri);
+					if (stat.type !== vscode.FileType.File) {continue;} //can't mark directory
+					if (provider.markedFiles.has(uri.fsPath)) {
+						provider.update([], [uri.fsPath]);
+					} else {
+						provider.update([uri.fsPath], []);
+					}
+				} 
+			}
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('markfiles.reloadFromScopeFile', async () => {
+			provider.loadFromScopeFile(true);
+			vscode.window.showInformationMessage('Loading marked files from scope file(s)');
+		})
+	);
 
 	//listen to configuration changes
 	vscode.workspace.onDidChangeConfiguration((e) => {
