@@ -2,7 +2,7 @@
   "name": "markfiles",
   "displayName": "Mark Files",
   "description": "An extension that allows you to mark files in the file explorer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "vquelque",
   "engines": {
     "vscode": "^1.76.0"

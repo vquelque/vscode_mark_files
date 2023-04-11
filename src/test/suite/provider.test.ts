@@ -22,14 +22,15 @@ suite("Provider Test Suite", () => {
   });
 
   test("Test mark file", async () => {
-    await vscode.commands.executeCommand('markfiles.markUnmarkSelectedFile');
-   // await vscode.commands.executeCommand('markfiles.writeMarkedFilesToDisk');
+    await vscode.commands.executeCommand("markfiles.markUnmarkSelectedFile");
+    // await vscode.commands.executeCommand('markfiles.writeMarkedFilesToDisk');
     console.log("keys : \n");
     console.log(extensionContext);
   });
-  
 
-  suiteTeardown(async () => {await removeTestFile();});
+  suiteTeardown(async () => {
+    await removeTestFile();
+  });
 });
 
 function sleep(ms: number): Promise<void> {
