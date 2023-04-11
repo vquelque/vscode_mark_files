@@ -57,6 +57,7 @@ export class DecorationProvider implements FileDecorationProvider {
     uris.forEach(async (uri) => {
       const stat = await workspace.fs.stat(uri);
       if (stat.type !== FileType.File) {
+        console.log("can't mark directory");
         return; //can't mark directory
       }
       const fPath = uri.fsPath;

@@ -98,7 +98,8 @@
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
+    "copy-files": "cp -r ./src/test/example ./out/test",
+    "pretest": "yarn run compile && yarn run lint && yarn run copy-files",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },

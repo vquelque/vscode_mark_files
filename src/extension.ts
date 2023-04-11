@@ -8,7 +8,6 @@ let storage: vscode.Memento;
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
   //create WS storage
-
   storage = context.workspaceState;
   if (!storage) {
     vscode.window.showInformationMessage(
@@ -86,6 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
     })
   );
+  return context;
 }
 
 //print to the output channel
