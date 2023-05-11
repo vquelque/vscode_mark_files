@@ -7,7 +7,7 @@
 The extension allows you to mark/unmark files by:
 
 - Providing a `scope.txt` file in the workspace root folder. The file contains a list of patterns for files to include in the scope. The patterns are written using the [.gitignore format](https://git-scm.com/docs/gitignore#_pattern_format), e.g., `**.sol` to include all Solidity files in all directories.
-- Selecting a single/multiple files in the explorer and clicking on `Mark/Unmark File` from the context menu.
+- Selecting a single/multiple files/folders in the explorer and clicking on `Mark/Unmark File` from the context menu.
 - Right clicking on an editor tab and selecting `Mark/Unmark File` from the context menu.
 
 Note that the marked files are stored in the workspace local storage. In case of mulit-root workspaces, if you don't save the workspace, the marks will be discarded if the workspace is closed. You can also export the marked files to a file on disk by invoking the `Export maked files to a file` command. For multi-root workspaces, marked files will be exported to individual files located at the root of each opened foler. Marked files exported to disk can be re-imported by naming the export file as `scope.txt`, and using the import feature.
