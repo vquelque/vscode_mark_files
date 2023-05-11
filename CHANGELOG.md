@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switch from disk-based storage to workspace memory (for future web compatibility)
 - Add a feature to export marked files to a custom file on disk
 
+## [1.1.1] - 2023-05-11
+
+### Added
+
+- Mark/Unmark folders from the file explorer (this will mark/unmark every subfile/subfolder)
+
 ### Changed
 
 - Formatted files using Prettier.

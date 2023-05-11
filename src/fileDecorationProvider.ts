@@ -56,19 +56,27 @@ export class DecorationProvider implements FileDecorationProvider {
   public async markOrUnmarkFiles(uris: Uri[]) {
     uris.forEach(async (uri) => {
       const stat = await workspace.fs.stat(uri);
-      if (stat.type !== FileType.File) {
-        console.log("can't mark directory");
-        return; //can't mark directory
+      switch (stat.type) {
+        case FileType.Directory:
+          // recurse
+          const files = (await workspace.fs.readDirectory(uri)).map((tu) =>
+            Uri.parse(`${uri}/${tu[0]}`)
+          );
+          return this.markOrUnmarkFiles(files);
+        case FileType.File:
+          const fPath = uri.fsPath;
+          if (this.markedFiles.has(uri.fsPath)) {
+            this.markedFiles.delete(fPath);
+            getStorage().update(fPath, undefined); //remove from WS storage
+          } else {
+            this.markedFiles.add(fPath);
+            getStorage().update(fPath, true); // add to WS storage
+          }
+          this._onDidChangeFileDecorations.fire(uri);
+          return;
+        default:
+          return;
       }
-      const fPath = uri.fsPath;
-      if (this.markedFiles.has(uri.fsPath)) {
-        this.markedFiles.delete(fPath);
-        getStorage().update(fPath, undefined); //remove from WS storage
-      } else {
-        this.markedFiles.add(fPath);
-        getStorage().update(fPath, true); // add to WS storage
-      }
-      this._onDidChangeFileDecorations.fire(uri);
     });
   }
 

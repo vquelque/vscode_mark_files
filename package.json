@@ -2,7 +2,7 @@
   "name": "markfiles",
   "displayName": "Mark Files",
   "description": "An extension that allows you to mark files in the file explorer",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "vquelque",
   "engines": {
     "vscode": "^1.76.0"
@@ -101,7 +101,8 @@
     "copy-files": "cp -r ./src/test/example ./out/test",
     "pretest": "yarn run compile && yarn run lint && yarn run copy-files",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "prettify": "prettier . --write"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
