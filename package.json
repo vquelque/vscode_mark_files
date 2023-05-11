@@ -101,7 +101,8 @@
     "copy-files": "cp -r ./src/test/example ./out/test",
     "pretest": "yarn run compile && yarn run lint && yarn run copy-files",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "prettify": "prettier . --write"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
