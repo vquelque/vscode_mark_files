@@ -32,9 +32,9 @@ export class DecorationProvider implements FileDecorationProvider {
     }
   }
 
-  provideFileDecoration(uri: Uri, token: CancellationToken): FileDecoration {
+  provideFileDecoration(uri: Uri, token: CancellationToken): FileDecoration | undefined {
     if (token.isCancellationRequested) {
-      return {};
+      return;
     }
     const config = workspace.getConfiguration("markfiles");
     const colorize =
@@ -49,7 +49,6 @@ export class DecorationProvider implements FileDecorationProvider {
         color: colorize && new ThemeColor("markfiles.markedFileColor"),
       };
     }
-    return {};
   }
 
   //mark or unmark files
