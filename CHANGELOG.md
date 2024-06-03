@@ -27,3 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Formatted files using Prettier.
+
+## [1.1.2] - 2024-06-03
+
+- Fix: empty decoration errors in last vscode builds
+- Bump dependencies
