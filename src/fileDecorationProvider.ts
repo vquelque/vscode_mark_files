@@ -32,7 +32,10 @@ export class DecorationProvider implements FileDecorationProvider {
     }
   }
 
-  provideFileDecoration(uri: Uri, token: CancellationToken): FileDecoration | undefined {
+  provideFileDecoration(
+    uri: Uri,
+    token: CancellationToken,
+  ): FileDecoration | undefined {
     if (token.isCancellationRequested) {
       return;
     }
@@ -56,13 +59,14 @@ export class DecorationProvider implements FileDecorationProvider {
     uris.forEach(async (uri) => {
       const stat = await workspace.fs.stat(uri);
       switch (stat.type) {
-        case FileType.Directory:
+        case FileType.Directory: {
           // recurse
           const files = (await workspace.fs.readDirectory(uri)).map((tu) =>
-            Uri.parse(`${uri}/${tu[0]}`)
+            Uri.parse(`${uri}/${tu[0]}`),
           );
           return this.markOrUnmarkFiles(files);
-        case FileType.File:
+        }
+        case FileType.File: {
           const fPath = uri.fsPath;
           if (this.markedFiles.has(uri.fsPath)) {
             this.markedFiles.delete(fPath);
@@ -73,6 +77,7 @@ export class DecorationProvider implements FileDecorationProvider {
           }
           this._onDidChangeFileDecorations.fire(uri);
           return;
+        }
         default:
           return;
       }
@@ -87,7 +92,7 @@ export class DecorationProvider implements FileDecorationProvider {
       const confirm = await window.showInformationMessage(
         "This operation will clear all marked files. Do you want to continue?",
         "Yes",
-        "No"
+        "No",
       );
       if (confirm === "No") {
         //abort
@@ -105,16 +110,16 @@ export class DecorationProvider implements FileDecorationProvider {
 
   public async configChanged() {
     this.markedFiles.forEach((markedFile) =>
-      this._onDidChangeFileDecorations.fire(Uri.file(markedFile))
+      this._onDidChangeFileDecorations.fire(Uri.file(markedFile)),
     );
   }
 
   async loadMarkedFiles(scopeUri: string, projectRootUri: string) {
-    let patterns = (await asyncReadFile(scopeUri)) || [];
+    const patterns = (await asyncReadFile(scopeUri)) || [];
     const ig = ignore().add(patterns);
     // find files in all workspace folders, and filter them according to the specified gitignore patterns
     // https://git-scm.com/docs/gitignore
-    let markedAbsPath = (await workspace.findFiles("**/*"))
+    const markedAbsPath = (await workspace.findFiles("**/*"))
       .map((uri) => path.relative(projectRootUri, uri.fsPath))
       .filter((relPath) => ig.ignores(relPath))
       .map((relPath) => Uri.file(path.resolve(projectRootUri, relPath)));
@@ -135,7 +140,7 @@ export class DecorationProvider implements FileDecorationProvider {
     }
     const scopeFileUrisByFolder = this.getFileURIsByFolderForWS(
       fileName,
-      "txt"
+      "txt",
     );
     if (!Object.keys(scopeFileUrisByFolder).length) {
       printChannelOutput("No opened project - aborting");
@@ -166,7 +171,7 @@ export class DecorationProvider implements FileDecorationProvider {
         const confirm = await window.showInformationMessage(
           "This operation will overwrite the existing scope file. Do you want to continue?",
           "Yes",
-          "No"
+          "No",
         );
         if (confirm === "No") {
           //abort
@@ -179,7 +184,7 @@ export class DecorationProvider implements FileDecorationProvider {
       writeFile(path, markedFiles, { flag: "w" }, (err) => {
         if (err) {
           console.error(
-            `markfiles: Failed to write scope file with path ${path}. Err: ${err}`
+            `markfiles: Failed to write scope file with path ${path}. Err: ${err}`,
           );
         }
       });
@@ -226,7 +231,7 @@ export class DecorationProvider implements FileDecorationProvider {
     const scopeFilesByProjectRootsURIs: { [scopeUri: string]: string } = {};
     //iterate over all opened workspace folders
     const rootFolders = workspace.workspaceFolders?.map(
-      (folder) => folder.uri.path
+      (folder) => folder.uri.path,
     );
     if (!rootFolders) {
       return {};

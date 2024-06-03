@@ -9,7 +9,7 @@ export async function asyncReadFile(path: string) {
     return arr;
   } catch (err) {
     console.error(
-      `markfiles: Failed to read file with path ${path} from disk. err: ${err}`
+      `markfiles: Failed to read file with path ${path} from disk. err: ${err}`,
     );
   }
 }

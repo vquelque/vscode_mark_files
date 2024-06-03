@@ -100,22 +100,23 @@
     "watch": "tsc -watch -p ./",
     "copy-files": "cp -r ./src/test/example ./out/test",
     "pretest": "yarn run compile && yarn run lint && yarn run copy-files",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src",
     "test": "node ./out/test/runTest.js",
     "prettify": "prettier . --write"
   },
   "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.x",
     "@types/vscode": "^1.76.0",
-    "@typescript-eslint/eslint-plugin": "^7.11.x",
-    "@typescript-eslint/parser": "^7.11.x",
     "@vscode/test-electron": "^2.2.3",
     "eslint": "^9.4.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.11.0"
   },
   "repository": {
     "type": "git",

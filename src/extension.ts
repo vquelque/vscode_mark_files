@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   storage = context.workspaceState;
   if (!storage) {
     vscode.window.showInformationMessage(
-      "Please create a workspace to save the marked files"
+      "Please create a workspace to save the marked files",
     );
   }
   //initialize output channel
@@ -20,19 +20,19 @@ export function activate(context: vscode.ExtensionContext) {
   //register the decoration provider
   provider = new DecorationProvider();
   context.subscriptions.push(
-    vscode.window.registerFileDecorationProvider(provider)
+    vscode.window.registerFileDecorationProvider(provider),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "markfiles.markUnmarkActiveFile",
-      async (contextUri: vscode.Uri) => {
+      async () => {
         const uri = vscode.window.activeTextEditor?.document.uri;
         if (uri) {
           provider.markOrUnmarkFiles([uri]);
         }
-      }
-    )
+      },
+    ),
   );
 
   context.subscriptions.push(
@@ -40,8 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
       "markfiles.writeMarkedFilesToDisk",
       async () => {
         await provider.exportMarkedFilesToFile();
-      }
-    )
+      },
+    ),
   );
 
   context.subscriptions.push(
@@ -49,8 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
       "markfiles.markUnmarkSelectedFile",
       async (clickedFile: vscode.Uri, selectedFiles: vscode.Uri[]) => {
         provider.markOrUnmarkFiles(selectedFiles);
-      }
-    )
+      },
+    ),
   );
 
   context.subscriptions.push(
@@ -59,10 +59,10 @@ export function activate(context: vscode.ExtensionContext) {
       async () => {
         provider.loadFromScopeFile(true);
         vscode.window.showInformationMessage(
-          "Loading marked files from scope file(s)"
+          "Loading marked files from scope file(s)",
         );
-      }
-    )
+      },
+    ),
   );
 
   context.subscriptions.push(
@@ -71,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (e.affectsConfiguration("markfiles")) {
         provider.configChanged();
       }
-    })
+    }),
   );
 
   context.subscriptions.push(
@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext) {
       for (const file of rename.files) {
         provider.handleFileRename(file.oldUri, file.newUri);
       }
-    })
+    }),
   );
   return context;
 }
