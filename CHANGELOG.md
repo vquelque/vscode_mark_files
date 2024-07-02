@@ -32,3 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix: empty decoration errors in last vscode builds
 - Bump dependencies
+
+### [1.1.3] - 2024-07-02
+
+- Fix: Import/Export marked files from scope file on Windows systems.
