@@ -1,20 +1,20 @@
 import path = require("path");
-import {
-  Uri,
-  CancellationToken,
-  FileDecorationProvider,
-  FileDecoration,
-  EventEmitter,
-  Event,
-  workspace,
-  ThemeColor,
-  FileType,
-  window,
-} from "vscode";
-import { asyncReadFile } from "./utils";
 import { existsSync, writeFile } from "fs";
 import ignore from "ignore";
+import {
+  CancellationToken,
+  Event,
+  EventEmitter,
+  FileDecoration,
+  FileDecorationProvider,
+  FileType,
+  ThemeColor,
+  Uri,
+  window,
+  workspace,
+} from "vscode";
 import { getStorage, printChannelOutput } from "./extension";
+import { asyncReadFile } from "./utils";
 
 export class DecorationProvider implements FileDecorationProvider {
   private readonly _onDidChangeFileDecorations: EventEmitter<Uri | Uri[]> =
@@ -62,7 +62,7 @@ export class DecorationProvider implements FileDecorationProvider {
         case FileType.Directory: {
           // recurse
           const files = (await workspace.fs.readDirectory(uri)).map((tu) =>
-            Uri.parse(`${uri}/${tu[0]}`),
+            Uri.file(`${uri}/${tu[0]}`),
           );
           return this.markOrUnmarkFiles(files);
         }
@@ -123,7 +123,7 @@ export class DecorationProvider implements FileDecorationProvider {
       .map((uri) => path.relative(projectRootUri, uri.fsPath))
       .filter((relPath) => ig.ignores(relPath))
       .map((relPath) => Uri.file(path.resolve(projectRootUri, relPath)));
-    printChannelOutput(`Loaded patterns from ${scopeUri}`);
+      printChannelOutput(`Loaded patterns from ${scopeUri}`);
     this.markOrUnmarkFiles(markedAbsPath);
   }
 
@@ -150,9 +150,10 @@ export class DecorationProvider implements FileDecorationProvider {
     const markedFilesByWS = Array.from(this.markedFiles).reduce<{
       [key: string]: string[];
     }>((acc: { [key: string]: string[] }, uri: string) => {
-      const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(uri));
+      const workspaceFolder = workspace.getWorkspaceFolder(Uri.file(uri));
       if (workspaceFolder) {
-        const relativePath = path.relative(workspaceFolder.uri.fsPath, uri); //use relative URIs in the scope file
+        const relativePath = path.relative(workspaceFolder.uri.fsPath, uri).replace(/\\/g, '/'); //use relative URIs in the scope file - use forward slash even on windows because of globs
+
         if (!acc[workspaceFolder.uri.fsPath]) {
           acc[workspaceFolder.uri.fsPath] = [relativePath];
         } else {
@@ -231,7 +232,7 @@ export class DecorationProvider implements FileDecorationProvider {
     const scopeFilesByProjectRootsURIs: { [scopeUri: string]: string } = {};
     //iterate over all opened workspace folders
     const rootFolders = workspace.workspaceFolders?.map(
-      (folder) => folder.uri.path,
+      (folder) => folder.uri.fsPath,
     );
     if (!rootFolders) {
       return {};
