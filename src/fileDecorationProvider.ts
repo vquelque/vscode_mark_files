@@ -116,7 +116,7 @@ export class DecorationProvider implements FileDecorationProvider {
 
   async loadMarkedFiles(scopeUri: string, projectRootUri: string) {
     const patterns = (await asyncReadFile(scopeUri)) || [];
-    const ig = ignore().add(patterns);
+    const ig = ignore().add(patterns.map(p => p.startsWith('./') ? p.slice(2) : p));
     // find files in all workspace folders, and filter them according to the specified gitignore patterns
     // https://git-scm.com/docs/gitignore
     const markedAbsPath = (await workspace.findFiles("**/*"))
