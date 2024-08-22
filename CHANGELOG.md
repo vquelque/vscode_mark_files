@@ -36,3 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### [1.1.3] - 2024-07-02
 
 - Fix: Import/Export marked files from scope file on Windows systems.
+
+### [1.1.4] - 2024-08-22
+
+- Fix: Support relative paths starting with `./` in scope file (Thanks @X1pherW0lf)
